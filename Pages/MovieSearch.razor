@@ -1,0 +1,66 @@
+﻿<h3>Movie Search</h3>
+@page "/"
+@inject IMovieService MovieService
+@using Lab5.Data
+
+<input type="text" @bind-value="searchTerm" @oninput="Search"/>
+<button class="btn btn-outline-info" @onclick="Clear">Clear</button>
+<style>
+    main {
+        background-color: #222222;
+    }
+    h3{
+        color : white;
+    }
+    input, textarea {
+        background-color: #333333;
+        color: #FFF;
+    }
+</style>
+
+@if (movies != null)
+{
+    <table class="table table-striped table-bordered table-hover table-dark">
+        <thead>
+            <tr>
+                <th>Movie Title</th>
+                <th>Year of Release</th>
+                <th>Genre</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Movie m in movies)
+            {
+                <tr>
+                    <td>@m.Title</td>
+                    <td>@m.Year</td>
+                    <td>@m.Genre</td>
+                </tr>
+
+            }
+
+        </tbody>
+    </table>
+}
+
+@code {
+    List<Movie>? movies;
+
+    string searchTerm { get; set; } = string.Empty;
+    char keyPressed;
+    protected override void OnInitialized()
+    {
+        movies = MovieService.ReadFromFile();
+    }
+    protected void Search(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        movies = MovieService.GetMovies(m => m.Title.ToUpper().Contains(searchTerm.ToUpper()));
+    }
+    protected void Clear()
+    {
+        movies = MovieService.ReadFromFile();
+    }
+
+}
+
